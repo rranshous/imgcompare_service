@@ -3,34 +3,34 @@ require 'phashion'
 require 'thread'
 require_relative 'array'
 require_relative 'tracked'
+require_relative 'background_runner'
 
-DATA_DIR = '/tmp'
-data_snapshot_path = File.join DATA_DIR, "index.marshall"
+DATA_DIR = ENV['DATA_DIR'] || '/tmp'
+
+bg_runner = BackgroundRunner.new
+saver = Saver.new DATA_DIR
+
+all_data = saver.load :all_data
 
 all_data = []
 last_snapshot_count = 0
 data_mutex = Mutex.new
 
-if File.exists? data_snapshot_path
+if File.exists? all_data_snapshot_path
   puts "LOADING SNAPSHOT"
-  bin_rep = File.open(data_snapshot_path, 'rb') {|fh| fh.read }
+  bin_rep = File.open(all_data_snapshot_path, 'rb') {|fh| fh.read }
   data_mutex.synchronize { all_data = Marshal.load(bin_rep) }
   puts "LOADED: #{all_data.length}"
   last_snapshot_count = all_data.length
 end
 
-Thread.new do
-  loop do
-    puts "background] sleeping"
-    sleep 10
-    puts "background] eval for dumping"
-    data_mutex.synchronize do
-      if all_data.length != last_snapshot_count
-        puts "background] dumping"
-        bin_rep = Marshal.dump all_data
-        last_snapshot_count = all_data.length
-        File.open(data_snapshot_path, 'wb') {|fh| fh.write bin_rep }
-      end
+bg_runner.every(10) do
+  data_mutex.synchronize do
+    if all_data.length != last_snapshot_count
+      puts "background] dumping"
+      bin_rep = Marshal.dump all_data
+      last_snapshot_count = all_data.length
+      File.open(all_data_snapshot_path, 'wb') {|fh| fh.write bin_rep }
     end
   end
 end
