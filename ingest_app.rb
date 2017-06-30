@@ -42,17 +42,7 @@ end
 get '/images.html' do
   max = (params[:max] || 1_000).to_i
   data_mutex.synchronize do
-    all_data.first(max).map do |tracked|
-      href = "/image/#{tracked.filename}"
-      """
-      <a href='#{href}'>
-      <img
-        alt='#{tracked.fingerprint} #{tracked.filename}'
-        style='width: 300px'
-        src='#{href}'>
-      </a>
-      """
-    end.join("\n")
+    all_data.first(max).map {|tracked| thumbnail_for tracked }.join("\n")
   end
 end
 
@@ -65,5 +55,31 @@ get '/image/:filename' do |filename|
   else
     content_type 'image/jpg'
     File.read(img.file_path)
+  end
+end
+
+get '/image/:filename/neighbors' do |filename|
+  threshold = (params[:threshold] || Tracked::THRESHOLD).to_i
+  puts "threshold: #{threshold}"
+  img = data_mutex.synchronize do
+    all_data.find {|t| t.filename == filename }
+  end
+  closest = data_mutex.synchronize do
+    all_data.select {|t| img.distance(t) < threshold }
+  end
+  closest.map { |tracked| thumbnail_for tracked }.join("\n")
+end
+
+helpers do
+  def thumbnail_for tracked
+    href = "/image/#{tracked.filename}"
+    """
+    <a href='#{href}/neighbors?threshold=20'>
+    <img
+      alt='#{tracked.fingerprint} #{tracked.filename}'
+      style='width: 300px'
+      src='#{href}'>
+    </a>
+    """
   end
 end

@@ -28,3 +28,18 @@ class Array
   end
 end
 
+module Lockable
+  attr_accessor :mutex
+
+  def initialize *args
+    super
+    self.mutex = Mutex.new
+  end
+
+  def with_lock &blk
+    raise 'Must provide block' if !blk
+    mutex.synchronize do
+      blk.call self
+    end
+  end
+end

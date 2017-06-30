@@ -13,7 +13,7 @@ class Tracked
   end
 
   def < other
-    dist = distance other.fingerprint
+    dist = distance other
     if dist <= THRESHOLD
       false
     else
@@ -22,7 +22,7 @@ class Tracked
   end
 
   def > other
-    dist = distance other.fingerprint
+    dist = distance other
     if dist <= THRESHOLD
       false
     else
@@ -31,12 +31,12 @@ class Tracked
   end
 
   def == other
-    dist = distance other.fingerprint
+    dist = distance other
     dist <= THRESHOLD
   end
 
-  def distance fingerprint
-    Phashion.hamming_distance self.fingerprint, fingerprint
+  def distance other
+    Phashion.hamming_distance self.fingerprint, other.fingerprint
   end
 end
 
