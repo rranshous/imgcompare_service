@@ -42,8 +42,10 @@ end
 
 get '/images.html' do
   max = (params[:max] || 1_000).to_i
+  offset = (params[:offset] || 0).to_i
   data_mutex.synchronize do
-    all_data.first(max).map {|tracked| thumbnail_for tracked }.join("\n")
+    all_data.drop(offset).first(max)
+      .map {|tracked| thumbnail_for tracked }.join("\n")
   end
 end
 
