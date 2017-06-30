@@ -73,20 +73,21 @@ get '/image/:filename/neighbors' do |filename|
 end
 
 get '/image/:filename/desc' do |filename|
+  max = (params[:max] || 1_000).to_i
   img = data_mutex.synchronize do
     all_data.find {|t| t.filename == filename }
   end
   from_img = data_mutex.synchronize do
     all_data.sort_by {|t| img.distance(t) }
   end
-  from_img.map { |tracked| thumbnail_for tracked }.join("\n")
+  from_img.first(max).map { |tracked| thumbnail_for tracked }.join("\n")
 end
 
 helpers do
   def thumbnail_for tracked
     href = "/image/#{tracked.filename}"
     #neighbors_href = "#{href}/neighbors?threshold=20"
-    sort_from_img_href = "#{href}/desc"
+    sort_from_img_href = "#{href}/desc?max=25"
     """
     <a href='#{sort_from_img_href}'>
     <img
