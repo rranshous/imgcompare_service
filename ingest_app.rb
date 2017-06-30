@@ -63,7 +63,6 @@ end
 
 get '/image/:filename/neighbors' do |filename|
   threshold = (params[:threshold] || Tracked::THRESHOLD).to_i
-  puts "threshold: #{threshold}"
   img = data_mutex.synchronize do
     all_data.find {|t| t.filename == filename }
   end
@@ -73,11 +72,23 @@ get '/image/:filename/neighbors' do |filename|
   closest.map { |tracked| thumbnail_for tracked }.join("\n")
 end
 
+get '/image/:filename/desc' do |filename|
+  img = data_mutex.synchronize do
+    all_data.find {|t| t.filename == filename }
+  end
+  from_img = data_mutex.synchronize do
+    all_data.sort_by {|t| img.distance(t) }
+  end
+  from_img.map { |tracked| thumbnail_for tracked }.join("\n")
+end
+
 helpers do
   def thumbnail_for tracked
     href = "/image/#{tracked.filename}"
+    #neighbors_href = "#{href}/neighbors?threshold=20"
+    sort_from_img_href = "#{href}/desc"
     """
-    <a href='#{href}/neighbors?threshold=20'>
+    <a href='#{sort_from_img_href}'>
     <img
       alt='#{tracked.fingerprint} #{tracked.filename}'
       style='width: 300px'
