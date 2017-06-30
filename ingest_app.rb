@@ -4,33 +4,25 @@ require 'thread'
 require_relative 'array'
 require_relative 'tracked'
 require_relative 'background_runner'
+require_relative 'saver'
 
 DATA_DIR = ENV['DATA_DIR'] || '/tmp'
 
 bg_runner = BackgroundRunner.new
 saver = Saver.new DATA_DIR
 
-all_data = saver.load :all_data
-
-all_data = []
-last_snapshot_count = 0
+all_data = saver.load(:all_data) || []
+last_snapshot_count = all_data.length
+puts "loaded: #{last_snapshot_count} images"
 data_mutex = Mutex.new
-
-if File.exists? all_data_snapshot_path
-  puts "LOADING SNAPSHOT"
-  bin_rep = File.open(all_data_snapshot_path, 'rb') {|fh| fh.read }
-  data_mutex.synchronize { all_data = Marshal.load(bin_rep) }
-  puts "LOADED: #{all_data.length}"
-  last_snapshot_count = all_data.length
-end
 
 bg_runner.every(10) do
   data_mutex.synchronize do
     if all_data.length != last_snapshot_count
       puts "background] dumping"
-      bin_rep = Marshal.dump all_data
+      saver.save :all_data, all_data
       last_snapshot_count = all_data.length
-      File.open(all_data_snapshot_path, 'wb') {|fh| fh.write bin_rep }
+      puts "saved: #{last_snapshot_count} images"
     end
   end
 end
@@ -48,17 +40,25 @@ post '/image' do
 end
 
 get '/images.html' do
+  max = (params[:max] || 1_000).to_i
   data_mutex.synchronize do
-    all_data.map do |tracked|
-      "<img style='width: 300px' src='/image/#{tracked.filename}'>"
+    all_data.first(max).map do |tracked|
+      href = "/image/#{tracked.filename}"
+      """
+      <a href='#{href}'>
+      <img
+        alt='#{tracked.fingerprint} #{tracked.filename}'
+        style='width: 300px'
+        src='#{href}'>
+      </a>
+      """
     end.join("\n")
   end
 end
 
 get '/image/:filename' do |filename|
-  puts "finding: #{filename}"
   img = data_mutex.synchronize do
-    all_data.find {|t| puts t.filename; t.filename == filename }
+    all_data.find {|t| t.filename == filename }
   end
   if img.nil?
     halt 404
