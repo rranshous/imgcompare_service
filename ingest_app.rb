@@ -1,12 +1,10 @@
 require 'sinatra'
 require 'phashion'
 require 'thread'
-require 'rmagick'
 require_relative 'array'
 require_relative 'tracked'
 require_relative 'background_runner'
 require_relative 'saver'
-require_relative 'color_comparer'
 
 DATA_DIR = ENV['DATA_DIR'] || '/tmp'
 
@@ -20,10 +18,11 @@ data_mutex = Mutex.new
 
 bg_runner.every(10) do
   data_mutex.synchronize do
-    puts "background] dumping"
-    saver.save :all_data, all_data
-    last_snapshot_count = all_data.length
-    puts "saved: #{last_snapshot_count} images"
+    if last_snapshot_count != all_data.length
+      saver.save :all_data, all_data
+      last_snapshot_count = all_data.length
+      puts "saved: #{last_snapshot_count} images"
+    end
   end
 end
 
@@ -81,15 +80,6 @@ get '/image/:filename/desc' do |filename|
   from_img = data_mutex.synchronize do
     all_data.sort_by {|t| img.distance(t) }
   end
-  from_img.first(max).map { |tracked| thumbnail_for tracked }.join("\n")
-end
-
-get '/image/:filename/desc_by_color' do |filename|
-  max = (params[:max] || 1_000).to_i
-  cc = ColorComparer.new
-  all_data_copy = all_data.dup
-  img = all_data_copy.find {|t| t.filename == filename }
-  from_img = all_data_copy.sort_by {|t| cc.diff img, t }
   from_img.first(max).map { |tracked| thumbnail_for tracked }.join("\n")
 end
 

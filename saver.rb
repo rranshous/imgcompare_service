@@ -8,7 +8,6 @@ class Saver
   end
 
   def load name
-    puts "saver] loading #{name}"
     file_path = path_for name
     if File.exists? file_path
       bin_rep = File.open(file_path, 'rb') {|fh| fh.read }
@@ -19,7 +18,6 @@ class Saver
   end
 
   def save name, data
-    puts "saver] saving #{name}"
     bin_rep = Marshal.dump data
     file_path = path_for name
     File.open(file_path, 'wb') {|fh| fh.write bin_rep }
