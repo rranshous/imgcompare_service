@@ -31,6 +31,7 @@ post '/image' do
   filename = params[:image][:filename]
   tfh = params[:image][:tempfile]
   file_path = File.join DATA_DIR, File.basename(filename)
+  halt 409 if File.exists? file_path
   File.open(file_path, 'w'){ |fh| fh.write tfh.read }
   p_img = Phashion::Image.new tfh.path
   fingerprint = p_img.fingerprint
