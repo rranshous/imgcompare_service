@@ -20,12 +20,10 @@ data_mutex = Mutex.new
 
 bg_runner.every(10) do
   data_mutex.synchronize do
-    if all_data.length != last_snapshot_count
-      puts "background] dumping"
-      saver.save :all_data, all_data
-      last_snapshot_count = all_data.length
-      puts "saved: #{last_snapshot_count} images"
-    end
+    puts "background] dumping"
+    saver.save :all_data, all_data
+    last_snapshot_count = all_data.length
+    puts "saved: #{last_snapshot_count} images"
   end
 end
 
@@ -89,12 +87,9 @@ end
 get '/image/:filename/desc_by_color' do |filename|
   max = (params[:max] || 1_000).to_i
   cc = ColorComparer.new
-  img = data_mutex.synchronize do
-    all_data.find {|t| t.filename == filename }
-  end
-  from_img = data_mutex.synchronize do
-    all_data.sort_by {|t| cc.diff img.file_path, t.file_path }
-  end
+  all_data_copy = all_data.dup
+  img = all_data_copy.find {|t| t.filename == filename }
+  from_img = all_data_copy.sort_by {|t| cc.diff img, t }
   from_img.first(max).map { |tracked| thumbnail_for tracked }.join("\n")
 end
 

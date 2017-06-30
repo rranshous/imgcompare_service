@@ -1,3 +1,5 @@
+require_relative 'color_comparer'
+
 class Tracked
   THRESHOLD = 10
 
@@ -6,10 +8,20 @@ class Tracked
   def initialize file_path, fingerprint
     self.file_path   = file_path
     self.fingerprint = fingerprint
+    @palette = nil
+    self.palette
   end
 
   def filename
     File.basename file_path
+  end
+
+  def palette
+    @palette ||= color_comparer.palette(file_path)
+  end
+
+  def color_comparer
+    ColorComparer.new
   end
 
   def < other

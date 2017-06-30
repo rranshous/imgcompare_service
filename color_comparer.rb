@@ -10,12 +10,11 @@ end
 class ColorComparer
 
   # https://github.com/jordanstephens/paleta#comparing-colors
-  def diff image_path1, image_path2
-    palette(image_path1).similarity(palette(image_path2))
+  def diff image1, image2
+    image1.palette.similarity image2.palette
   end
 
   def palette image_path
-    Paleta::Palette.generate(:from => :image, :image => image_path, :size => 64)
+    Paleta::Palette.generate(:from => :image, :image => image_path, :size => 4)
   end
-
 end
