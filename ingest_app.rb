@@ -1,10 +1,12 @@
 require 'sinatra'
 require 'phashion'
 require 'thread'
+require 'rmagick'
 require_relative 'array'
 require_relative 'tracked'
 require_relative 'background_runner'
 require_relative 'saver'
+require_relative 'color_comparer'
 
 DATA_DIR = ENV['DATA_DIR'] || '/tmp'
 
@@ -37,6 +39,7 @@ post '/image' do
   fingerprint = p_img.fingerprint
   t = Tracked.new file_path, fingerprint
   data_mutex.synchronize { all_data.binary_insert t }
+  tfh.unlink
   puts "fingerprint: #{fingerprint}"
 end
 
@@ -79,6 +82,18 @@ get '/image/:filename/desc' do |filename|
   end
   from_img = data_mutex.synchronize do
     all_data.sort_by {|t| img.distance(t) }
+  end
+  from_img.first(max).map { |tracked| thumbnail_for tracked }.join("\n")
+end
+
+get '/image/:filename/desc_by_color' do |filename|
+  max = (params[:max] || 1_000).to_i
+  cc = ColorComparer.new
+  img = data_mutex.synchronize do
+    all_data.find {|t| t.filename == filename }
+  end
+  from_img = data_mutex.synchronize do
+    all_data.sort_by {|t| cc.diff img.file_path, t.file_path }
   end
   from_img.first(max).map { |tracked| thumbnail_for tracked }.join("\n")
 end
