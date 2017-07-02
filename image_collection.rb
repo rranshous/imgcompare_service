@@ -24,6 +24,10 @@ class ImageCollection
     synchronize{ @data.dup }.select(&blk)
   end
 
+  def size
+    synchronize{ @data.dup }.length
+  end
+
   def find criteria
     select do |image|
       criteria.any? do |message, reply|
@@ -35,5 +39,9 @@ class ImageCollection
 
   def synchronize
     mutex.synchronize { yield }
+  end
+
+  def to_s
+    "#{super}:#{synchronize { @data.dup }}"
   end
 end

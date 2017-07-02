@@ -1,5 +1,5 @@
 class Image
-  attr_accessor :path
+  attr_accessor :path, :fingerprint
 
   def self.load path
     new path: path
@@ -9,8 +9,8 @@ class Image
     self.path ||= opts[:path]
   end
 
-  def data data_reader
-    data_reader.read self.path
+  def data
+    path.read
   end
 
 end

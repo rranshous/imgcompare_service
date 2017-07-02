@@ -1,17 +1,23 @@
 require 'sinatra'
-require_relative 'scanner'
-require_relative 'disk_reader'
+require_relative 'disk_scanner'
 require_relative 'image'
 require_relative 'image_collection'
+require_relative 'image_fingerprinter'
 
 DATA_ROOT = 'data'
 
 images = ImageCollection.new
-reader = DiskReader.new
+fingerprinter = ImageFingerprinter.new
 
-scanner = Scanner.new Image
-scanner.scan DATA_ROOT, images
+disk_scanner = DiskScanner.new Image
+disk_scanner.scan("#{DATA_ROOT}/**/*.jpg", images)
 
+images.each do |image|
+  fingerprinter.fingerprint(image)
+  #color_scanner.scan(image)
+end
+
+puts "images: #{images.size}"
 
 get '/images.html' do
   """
@@ -31,7 +37,7 @@ get '/images/*/data' do
   content_type 'image/jpeg'
   image = images.find path: Pathname.new(image_path)
   halt 404 if image.nil?
-  data = image.data reader
+  data = image.data
   puts "data len: #{data.length}"
   data
 end
