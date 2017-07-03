@@ -39,10 +39,11 @@ puts "with fingerprint: #{images.select{|i| i.fingerprint}.size}"
 
 get '/images.html' do
   max = (params[:max] || 20).to_i
+  offset = (params[:offset] || 0).to_i
   """
   <style>img { width: 300px }</style>
   """ + \
-  images.to_a.first(max).map do |image|
+  images.to_a.drop(offset).first(max).map do |image|
     image_thumbnail image
   end.to_a.join("\n")
 end
