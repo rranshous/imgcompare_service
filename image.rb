@@ -13,4 +13,8 @@ class Image
     path.read
   end
 
+  def to_s
+    "#<#{self.class.name}:#{path}>"
+  end
+
 end

@@ -15,12 +15,13 @@ fingerprinter = ImageFingerprinter.new
 color_saver = ColorSaver.new
 
 disk_scanner = DiskScanner.new Image
-disk_scanner.scan("#{DATA_ROOT}/**{,/*/**}/*.jpg").first(MAX_SCAN).to_a
-            .each { |image| images << image }
+found_images = disk_scanner.scan("#{DATA_ROOT}/**{,/*/**}/*.jpg").first(MAX_SCAN)
+found_images.to_a.each { |image| images << image }
 
-images.each do |image|
+images.to_a.each_with_index do |image, i|
+  puts "[#{i+1} / #{images.size}] loading metadata: #{image}"
   fingerprinter.fingerprint(image) if !image.fingerprint
-  color_saver.load(image)   if !image.palette
+  color_saver.load(image)          if !image.palette
   #color_scanner.scan(image) if !image.palette
 end
 

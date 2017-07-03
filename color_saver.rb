@@ -5,7 +5,6 @@ class ColorSaver
   def load image
     save_path = color_path(image)
     if save_path.exist?
-      puts "loading colors for: #{image}"
       colors = colors_from_file save_path
       image.palette = Paleta::Palette.new colors if colors.length > 0
     end
