@@ -3,5 +3,6 @@ gem 'phashion'
 gem 'sinatra'
 gem 'rspec'
 gem 'thin'
+gem 'paleta'
 
 gem 'pry', group: :test

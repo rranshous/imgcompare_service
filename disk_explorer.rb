@@ -3,18 +3,20 @@ require_relative 'disk_scanner'
 require_relative 'image'
 require_relative 'image_collection'
 require_relative 'image_fingerprinter'
+require_relative 'color_scanner'
 
 DATA_ROOT = 'data'
 
 images = ImageCollection.new
 fingerprinter = ImageFingerprinter.new
+color_scanner = ColorScanner.new
 
 disk_scanner = DiskScanner.new Image
 disk_scanner.scan("#{DATA_ROOT}/**/*.jpg", images)
 
 images.each do |image|
   fingerprinter.fingerprint(image)
-  #color_scanner.scan(image)
+  color_scanner.scan(image)
 end
 
 puts "images: #{images.size}"
