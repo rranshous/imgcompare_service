@@ -11,7 +11,7 @@ MAX_SCAN = 10_000_000
 
 images = ImageCollection.new
 fingerprinter = ImageFingerprinter.new
-color_scanner = ColorScanner.new
+#color_scanner = ColorScanner.new
 color_saver = ColorSaver.new
 
 disk_scanner = DiskScanner.new Image
@@ -22,7 +22,7 @@ end
 images.each do |image|
   fingerprinter.fingerprint(image) if !image.fingerprint
   color_saver.load(image)   if !image.palette
-  color_scanner.scan(image) if !image.palette
+  #color_scanner.scan(image) if !image.palette
 end
 
 puts "images: #{images.size}"
