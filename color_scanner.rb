@@ -6,7 +6,9 @@ class ColorScanner
   end
 
   def palette image
-    Paleta::Palette.new(*colors(image))
+    found_colors = colors(image)
+    return nil if found_colors.length == 0
+    Paleta::Palette.new(*found_colors)
   end
 
   def colors image

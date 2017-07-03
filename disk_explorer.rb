@@ -26,12 +26,8 @@ get '/images.html' do
   <style>img { width: 300px }</style>
   """ + \
   images.map do |image|
-    """
-    <a href='/images/#{image.path}/data'>
-      <img src='/images/#{image.path}/data'>
-    </a>
-    """
-  end.join("\n")
+    image_thumbnail image
+  end.to_a.join("\n")
 end
 
 get '/images/*/data' do
@@ -44,3 +40,28 @@ get '/images/*/data' do
   data
 end
 
+get '/images/*/similar_color' do
+  image_path = params['splat'].first
+  image = images.find path: Pathname.new(image_path)
+  halt 404 if image.nil?
+  """
+  <style>img { width: 300px }</style>
+  """ + \
+  images.to_a.sort_by do |other_image|
+    case other_image.palette
+    when nil then 1
+    else image.palette.similarity other_image.palette
+    end
+  end.to_a.first(10)
+  .map { |similar_image| image_thumbnail(similar_image) }.join("\n")
+end
+
+helpers do
+  def image_thumbnail image
+    """
+    <a href='/images/#{image.path}/data'>
+      <img src='/images/#{image.path}/data'>
+    </a>
+    """
+  end
+end

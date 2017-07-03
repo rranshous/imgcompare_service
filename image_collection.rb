@@ -3,38 +3,41 @@ require 'thread'
 class ImageCollection
   attr_accessor :mutex
 
-  def initialize
-    @data = []
+  def initialize data=[]
+    @data = data.dup
     self.mutex = Mutex.new
-  end
-
-  def each &blk
-    synchronize{ @data.dup }.each(&blk)
   end
 
   def << image
     synchronize { @data << image }
   end
 
+  def find criteria
+    select do |image|
+      criteria.any? do |message, reply|
+        image.public_send(message) == reply
+      end
+    end.to_a.first
+  end
+
+  def each &blk
+    to_a.each(&blk) and self
+  end
+
   def map &blk
-    synchronize{ @data.dup }.map(&blk)
+    self.class.new to_a.map(&blk)
   end
 
   def select &blk
-    synchronize{ @data.dup }.select(&blk)
+    self.class.new to_a.select(&blk)
   end
 
   def size
     synchronize{ @data.dup }.length
   end
 
-  def find criteria
-    select do |image|
-      criteria.any? do |message, reply|
-        puts "#{image}: #{message} #{reply} | #{image.public_send(message)}"
-        image.public_send(message) == reply
-      end
-    end.first
+  def to_a
+    synchronize{ @data.dup }
   end
 
   def synchronize
