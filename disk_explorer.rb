@@ -7,6 +7,7 @@ require_relative 'color_scanner'
 require_relative 'color_saver'
 require_relative 'color_comparer'
 require_relative 'fingerprint_loader'
+require_relative 'background_runner'
 
 DATA_ROOT = 'data'
 MAX_SCAN = 10_000_000
@@ -17,17 +18,19 @@ images = ImageCollection.new
 color_comparer = ColorComparer.new
 fingerprint_loader = FingerprintLoader.new
 color_saver = ColorSaver.new
+backgrounder = BackgroundRunner.new
 
 disk_scanner = DiskScanner.new Image
 found_images = disk_scanner.scan("#{DATA_ROOT}/**{,/*/**}/*.jpg").first(MAX_SCAN)
-found_images.to_a.each { |image| images << image }
-
-images.to_a.each_with_index do |image, i|
-  puts "[#{i+1} / #{images.size}] loading metadata: #{image}"
-  fingerprint_loader.load(image)   if !image.fingerprint
-  color_saver.load(image)          if !image.palette
-  #fingerprinter.fingerprint(image) if !image.fingerprint
-  #color_scanner.scan(image) if !image.palette
+found_images = found_images.to_a
+backgrounder.background do
+  found_images.each_with_index do |image, i|
+    puts "[#{i+1} / #{found_images.size}] loading: #{image}"
+    fingerprint_loader.load(image)   if !image.fingerprint
+    color_saver.load(image)          if !image.palette
+    images << image
+    sleep 1
+  end
 end
 
 puts "images: #{images.size}"
