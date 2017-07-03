@@ -1,5 +1,5 @@
 class Image
-  attr_accessor :path, :fingerprint, :palette
+  attr_accessor :path, :fingerprint, :palette, :colors
 
   def self.load path
     new path: path

@@ -32,6 +32,7 @@ end
 
 puts "images: #{images.size}"
 puts "with palette: #{images.select{|i| i.palette}.size}"
+puts "with colors: #{images.select{|i| i.colors.length > 0}.size}"
 puts "with fingerprint: #{images.select{|i| i.fingerprint}.size}"
 
 get '/images.html' do
@@ -72,9 +73,9 @@ helpers do
   def image_thumbnail image
     """
     <a href='/images/#{image.path}/similar_color'>
-    #{image.palette ? image.palette.colors.reverse.map{|c| "<div style='border: 5px solid ##{c.hex}'>"}.join("\n") : ''}
+    #{image.palette && false ? image.palette.colors.reverse.map{|c| "<div style='border: 5px solid ##{c.hex}'>"}.join("\n") : ''}
       <img src='/images/#{image.path}/data'>
-    #{image.palette ? image.palette.colors.map{|c| '</div>'}.join("\n") : ''}
+    #{image.palette && false ? image.palette.colors.map{|c| '</div>'}.join("\n") : ''}
     </a>
     """
   end
