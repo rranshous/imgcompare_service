@@ -7,6 +7,7 @@ require_relative 'color_scanner'
 require_relative 'color_saver'
 
 DATA_ROOT = 'data'
+MAX_SCAN = 100
 
 images = ImageCollection.new
 fingerprinter = ImageFingerprinter.new
@@ -14,7 +15,9 @@ color_scanner = ColorScanner.new
 color_saver = ColorSaver.new
 
 disk_scanner = DiskScanner.new Image
-disk_scanner.scan("#{DATA_ROOT}/**/*.jpg", images)
+disk_scanner.scan("#{DATA_ROOT}/**/*.jpg").first(MAX_SCAN).to_a.each do |image|
+  images << image
+end
 
 images.each do |image|
   fingerprinter.fingerprint(image) if !image.fingerprint

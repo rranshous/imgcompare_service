@@ -5,9 +5,7 @@ class DiskScanner
     self.item_loader = item_loader
   end
 
-  def scan pattern, collection
-    Dir[pattern].each do |path|
-      collection << item_loader.load(Pathname.new(path))
-    end
+  def scan pattern
+    Dir[pattern].lazy.map { |path| item_loader.load(Pathname.new(path)) }
   end
 end
