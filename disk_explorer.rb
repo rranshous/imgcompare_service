@@ -28,10 +28,11 @@ end
 puts "images: #{images.size}"
 
 get '/images.html' do
+  max = (params[:max] || 100).to_i
   """
   <style>img { width: 300px }</style>
   """ + \
-  images.map do |image|
+  images.to_a.first(max).map do |image|
     image_thumbnail image
   end.to_a.join("\n")
 end
@@ -47,6 +48,7 @@ get '/images/*/data' do
 end
 
 get '/images/*/similar_color' do
+  max = (params[:max] || 100).to_i
   image_path = params['splat'].first
   image = images.find path: Pathname.new(image_path)
   halt 404 if image.nil?
@@ -58,7 +60,7 @@ get '/images/*/similar_color' do
     when nil then 1
     else image.palette.similarity other_image.palette
     end
-  end.to_a.first(10)
+  end.to_a.first(max)
   .map { |similar_image| image_thumbnail(similar_image) }.join("\n")
 end
 
