@@ -7,7 +7,7 @@ require_relative 'color_scanner'
 require_relative 'color_saver'
 
 DATA_ROOT = 'data'
-MAX_SCAN = 100
+MAX_SCAN = 10_000_000
 
 images = ImageCollection.new
 fingerprinter = ImageFingerprinter.new
