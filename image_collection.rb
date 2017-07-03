@@ -45,6 +45,6 @@ class ImageCollection
   end
 
   def to_s
-    "#{super}:#{synchronize { @data.dup }}"
+    "#{super}:#{size}"
   end
 end
