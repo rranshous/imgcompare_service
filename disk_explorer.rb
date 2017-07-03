@@ -32,7 +32,7 @@ backgrounder.background do
   end
   puts "images: #{images.size}"
   puts "with palette: #{images.select{|i| i.palette}.size}"
-  puts "with colors: #{images.select{|i| i.colors.length > 0}.size}"
+  puts "with colors: #{images.select{|i| i.colors? }.size}"
   puts "with fingerprint: #{images.select{|i| i.fingerprint}.size}"
 end
 

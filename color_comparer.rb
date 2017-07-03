@@ -43,7 +43,7 @@ class ColorComparer
   def sort_similar image, images
     comparitors = image.colors.map{|c| Color::Comparison.new(c)}
 
-    images.select{|o| o.colors.length > 0 }.to_a.sort_by do |other_image|
+    images.select{|o| o.colors? }.to_a.sort_by do |other_image|
       # go through each images colors finding closest distance from
       # the other images colors and sum
       comparitors.map do |comparitor|
