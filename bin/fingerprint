@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require 'ostruct'
+require 'pathname'
+require_relative '../image_fingerprinter'
+
+raise 'must provide file path' if ARGV.first.nil?
+file_path = Pathname.new ARGV.first
+
+puts ImageFingerprinter.new.fingerprint OpenStruct.new(path: file_path)
