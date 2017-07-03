@@ -30,12 +30,11 @@ backgrounder.background do
     color_saver.load(image)          if !image.palette
     images << image
   end
+  puts "images: #{images.size}"
+  puts "with palette: #{images.select{|i| i.palette}.size}"
+  puts "with colors: #{images.select{|i| i.colors.length > 0}.size}"
+  puts "with fingerprint: #{images.select{|i| i.fingerprint}.size}"
 end
-
-puts "images: #{images.size}"
-puts "with palette: #{images.select{|i| i.palette}.size}"
-puts "with colors: #{images.select{|i| i.colors.length > 0}.size}"
-puts "with fingerprint: #{images.select{|i| i.fingerprint}.size}"
 
 get '/images.html' do
   max = (params[:max] || 20).to_i
@@ -43,7 +42,7 @@ get '/images.html' do
   """
   <style>img { width: 300px }</style>
   """ + \
-  images.to_a.drop(offset).first(max).map do |image|
+  images.select{|i| i.colors.length > 0}.to_a.drop(offset).first(max).map do |image|
     image_thumbnail image
   end.to_a.join("\n")
 end
