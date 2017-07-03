@@ -5,6 +5,7 @@ require_relative 'image_collection'
 require_relative 'image_fingerprinter'
 require_relative 'color_scanner'
 require_relative 'color_saver'
+require_relative 'color_comparer'
 require_relative 'fingerprint_loader'
 
 DATA_ROOT = 'data'
@@ -13,6 +14,7 @@ MAX_SCAN = 10_000_000
 images = ImageCollection.new
 #fingerprinter = ImageFingerprinter.new
 #color_scanner = ColorScanner.new
+color_comparer = ColorComparer.new
 fingerprint_loader = FingerprintLoader.new
 color_saver = ColorSaver.new
 
@@ -33,7 +35,7 @@ puts "with palette: #{images.select{|i| i.palette}.size}"
 puts "with fingerprint: #{images.select{|i| i.fingerprint}.size}"
 
 get '/images.html' do
-  max = (params[:max] || 100).to_i
+  max = (params[:max] || 20).to_i
   """
   <style>img { width: 300px }</style>
   """ + \
@@ -53,7 +55,7 @@ get '/images/*/data' do
 end
 
 get '/images/*/similar_color' do
-  max = (params[:max] || 100).to_i
+  max = (params[:max] || 20).to_i
   image_path = params['splat'].first
   image = images.find path: Pathname.new(image_path)
   halt 400 if image.palette.nil?
@@ -61,12 +63,8 @@ get '/images/*/similar_color' do
   """
   <style>img { width: 300px }</style>
   """ + \
-  images.select{|o| o.palette }.to_a.sort_by do |other_image|
-    r = image.palette.similarity other_image.palette
-    r.nan? ? 1 : r
-  end.to_a
-  .select {|i| image.palette.similarity(i.palette) < 0.03 }
-  .first(max)
+  image_thumbnail(image) + \
+  color_comparer.sort_similar(image, images.select{|i| i != image}).first(max)
   .map { |similar_image| image_thumbnail(similar_image) }.join("\n")
 end
 
