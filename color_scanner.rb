@@ -2,6 +2,7 @@ require 'paleta'
 
 class ColorScanner
   def scan image
+    puts "scanning colors for: #{image}"
     image.palette = palette image
   end
 
