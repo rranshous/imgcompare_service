@@ -17,4 +17,8 @@ class Image
     "#<#{self.class.name}:#{path}>"
   end
 
+  def colors?
+    colors && colors.length > 0
+  end
+
 end

@@ -42,7 +42,8 @@ get '/images.html' do
   """
   <style>img { width: 300px }</style>
   """ + \
-  images.select{|i| i.colors.length > 0}.to_a.drop(offset).first(max).map do |image|
+  images.select{|i| i.colors? }
+  .to_a.drop(offset).first(max).map do |image|
     image_thumbnail image
   end.to_a.join("\n")
 end
