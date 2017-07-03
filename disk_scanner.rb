@@ -6,6 +6,7 @@ class DiskScanner
   end
 
   def scan pattern
+    puts "Scanning: #{pattern}"
     Dir[pattern].lazy.map { |path| item_loader.load(Pathname.new(path)) }
   end
 end
