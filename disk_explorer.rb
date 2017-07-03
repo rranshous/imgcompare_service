@@ -26,6 +26,8 @@ images.to_a.each_with_index do |image, i|
 end
 
 puts "images: #{images.size}"
+puts "with palette: #{images.select{|i| i.palette}.size}"
+puts "with fingerprint: #{images.select{|i| i.fingerprint}.size}"
 
 get '/images.html' do
   max = (params[:max] || 100).to_i
@@ -67,7 +69,7 @@ end
 helpers do
   def image_thumbnail image
     """
-    <a href='/images/#{image.path}/data'>
+    <a href='/images/#{image.path}/similar_color'>
       <img src='/images/#{image.path}/data'>
     </a>
     """

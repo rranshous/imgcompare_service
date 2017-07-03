@@ -6,7 +6,7 @@ class ColorSaver
     save_path = color_path(image)
     if save_path.exist?
       colors = colors_from_file save_path
-      image.palette = Paleta::Palette.new colors if colors.length > 0
+      image.palette = Paleta::Palette.new colors if colors.length >= 3
     end
   end
 
