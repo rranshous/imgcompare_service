@@ -15,9 +15,8 @@ fingerprinter = ImageFingerprinter.new
 color_saver = ColorSaver.new
 
 disk_scanner = DiskScanner.new Image
-disk_scanner.scan("#{DATA_ROOT}/**/*.jpg").first(MAX_SCAN).to_a.each do |image|
-  images << image
-end
+disk_scanner.scan("#{DATA_ROOT}/**{,/*/**}/*.jpg").first(MAX_SCAN).to_a
+            .each { |image| images << image }
 
 images.each do |image|
   fingerprinter.fingerprint(image) if !image.fingerprint
