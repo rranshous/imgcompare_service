@@ -29,7 +29,6 @@ backgrounder.background do
     fingerprint_loader.load(image)   if !image.fingerprint
     color_saver.load(image)          if !image.palette
     images << image
-    sleep 1
   end
 end
 
