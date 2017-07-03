@@ -17,7 +17,7 @@ class ColorSaver
       rescue ArgumentError
         nil
       end
-    end.compact
+    end.compact.first(3)
   end
 
   def deserialize_colors str
