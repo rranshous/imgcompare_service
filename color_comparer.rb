@@ -9,6 +9,10 @@ end
 
 class ColorComparer
 
+  def initialize
+    @cache = {}
+  end
+
   # https://github.com/jordanstephens/paleta#comparing-colors
   def diff image1, image2
     image1.palette.similarity image2.palette
@@ -40,19 +44,23 @@ class ColorComparer
   end
 
   # matching color distances
+  #  BEST SO FAR
   def sort_similar image, images
-    comparitors = image.colors.map{|c| Color::Comparison.new(c)}
-
-    images.select{|o| o.colors? }.to_a.sort_by do |other_image|
+    r = images.select{|o| o.colors? }.to_a.sort_by do |other_image|
+      s = Time.now.to_f
       # go through each images colors finding closest distance from
       # the other images colors and sum
-      comparitors.map do |comparitor|
+      r = image.colors.map do |color|
         other_image.colors.map do |other_color|
-          comparitor.compare other_color
+          human_compare_colors color, other_color
         end.sort.first
       end.reduce(:+)
-
+      puts "compare took: #{Time.now.to_f - s}"
+      r
     end.to_a
+  end
 
+  def human_compare_colors color1, color2
+    Color::Comparison.distance color1, color2
   end
 end

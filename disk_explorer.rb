@@ -53,9 +53,7 @@ get '/images/*/data' do
   content_type 'image/jpeg'
   image = images.find path: Pathname.new(image_path)
   halt 404 if image.nil?
-  data = image.data
-  puts "data len: #{data.length}"
-  data
+  image.data
 end
 
 get '/images/*/similar_color' do
@@ -76,9 +74,7 @@ helpers do
   def image_thumbnail image
     """
     <a href='/images/#{image.path}/similar_color'>
-    #{image.palette && false ? image.palette.colors.reverse.map{|c| "<div style='border: 5px solid ##{c.hex}'>"}.join("\n") : ''}
       <img src='/images/#{image.path}/data'>
-    #{image.palette && false ? image.palette.colors.map{|c| '</div>'}.join("\n") : ''}
     </a>
     """
   end
