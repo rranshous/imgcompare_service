@@ -60,6 +60,7 @@ get '/images/*/similar_color' do
   max = (params[:max] || 20).to_i
   image_path = params['splat'].first
   image = images.find path: Pathname.new(image_path)
+  halt 404 if image.nil?
   halt 400 if image.palette.nil?
   halt 404 if image.nil?
   begin
@@ -84,4 +85,8 @@ helpers do
     </a>
     """
   end
+end
+
+configure do
+  set :traps, false
 end
