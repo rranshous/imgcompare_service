@@ -10,7 +10,7 @@ require_relative 'fingerprint_loader'
 require_relative 'background_runner'
 
 DATA_ROOT = 'data'
-MAX_SCAN = 10_000_000
+MAX_SCAN = 50_000
 
 images = ImageCollection.new
 #fingerprinter = ImageFingerprinter.new
