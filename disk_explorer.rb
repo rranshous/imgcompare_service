@@ -62,12 +62,18 @@ get '/images/*/similar_color' do
   image = images.find path: Pathname.new(image_path)
   halt 400 if image.palette.nil?
   halt 404 if image.nil?
-  """
-  <style>img { width: 300px }</style>
-  """ + \
-  image_thumbnail(image) + \
-  color_comparer.sort_similar_parallel(image, images.select{|i| i != image}).first(max)
-  .map { |similar_image| image_thumbnail(similar_image) }.join("\n")
+  begin
+    timeout(25) do
+      """
+      <style>img { width: 300px }</style>
+      """ + \
+      image_thumbnail(image) + \
+      color_comparer.sort_similar_parallel(image, images.select{|i| i != image}).first(max)
+      .map { |similar_image| image_thumbnail(similar_image) }.join("\n")
+    end
+  rescue TimeoutError
+    halt 503, "Timeout"
+  end
 end
 
 helpers do
