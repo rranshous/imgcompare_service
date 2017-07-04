@@ -11,9 +11,10 @@ mosquitto_sub -h $host -t '#' | grep "jpg$" | while read l; do
   action=$(echo "$l" | cut -d' ' -f2)
   filename=$(echo "$l" | cut -d' ' -f3)
   filepath="$DATA_ROOT/$dir/$filename"
-  outpath="$filepath.fingerprint"
+  outpath="$filepath.colors"
   if [[ "$action" == *"CLOSE_WRITE"* ]]; then
-    echo "fingerprinting: $filepath"
-    fingerprint "$filepath" > "$outpath"
+    echo "dumping colors: $filepath"
+    dcolor -k 10 "$filepath" > "$outpath"
   fi
 done
+
