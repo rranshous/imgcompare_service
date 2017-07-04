@@ -1,5 +1,6 @@
 require 'paleta'
 require 'color-rgb'
+require 'parallel'
 
 # hack, to get around method incorrectly failing
 # https://github.com/jordanstephens/paleta/blob/db19d8b407dc461305f5bfb45c90e5c4383fcf4a/lib/paleta.rb#L14
@@ -46,18 +47,28 @@ class ColorComparer
   # matching color distances
   #  BEST SO FAR
   def sort_similar image, images
-    r = images.select{|o| o.colors? }.to_a.sort_by do |other_image|
-      s = Time.now.to_f
+    images.select{|o| o.colors? }.to_a.sort_by do |other_image|
       # go through each images colors finding closest distance from
       # the other images colors and sum
-      r = image.colors.map do |color|
+      image.colors.map do |color|
         other_image.colors.map do |other_color|
           human_compare_colors color, other_color
         end.sort.first
       end.reduce(:+)
-      puts "compare took: #{Time.now.to_f - s}"
-      r
     end.to_a
+  end
+
+  # matching color distances
+  def sort_similar_parallel image, images
+    other_images = images.select{|o| o.colors? }.to_a
+    distances = Parallel.map(other_images) do |other_image|
+      image.colors.map do |color|
+        other_image.colors.map do |other_color|
+          human_compare_colors color, other_color
+        end.sort.first
+      end.reduce(:+)
+    end
+    distances.zip(other_images).sort.map {|(_,i)| i }
   end
 
   def human_compare_colors color1, color2

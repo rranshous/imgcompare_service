@@ -66,7 +66,7 @@ get '/images/*/similar_color' do
   <style>img { width: 300px }</style>
   """ + \
   image_thumbnail(image) + \
-  color_comparer.sort_similar(image, images.select{|i| i != image}).first(max)
+  color_comparer.sort_similar_parallel(image, images.select{|i| i != image}).first(max)
   .map { |similar_image| image_thumbnail(similar_image) }.join("\n")
 end
 
