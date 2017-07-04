@@ -1,0 +1,20 @@
+FROM ruby:2.4.0
+
+# install mosquitto client
+RUN apt-get update && apt-get install -y wget && \
+    wget -q -O - https://repo.mosquitto.org/debian/mosquitto-repo.gpg.key | apt-key add - && \
+    wget -q -O /etc/apt/sources.list.d/mosquitto-jessie.list https://repo.mosquitto.org/debian/mosquitto-jessie.list && \
+    apt-get update && apt-get install -y mosquitto-clients
+
+VOLUME /data
+ENV DATA_ROOT=/data
+
+ADD ./ /app
+WORKDIR /app
+
+RUN ln -s /app/bin/* /usr/bin/
+
+RUN bundle install
+
+ENTRYPOINT ["bundle", "exec", "app/fingerprint-service/run"]
+CMD ["localhost"]

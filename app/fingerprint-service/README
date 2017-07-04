@@ -1,0 +1,2 @@
+application which gets fs notify events from MQTT
+and dumps the dhash fingerprint for new images next to the image
