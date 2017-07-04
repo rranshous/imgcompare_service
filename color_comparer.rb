@@ -68,7 +68,9 @@ class ColorComparer
         end.sort.first
       end.reduce(:+)
     end
-    distances.zip(other_images).sort.map {|(_,i)| i }
+    distances = distances.zip((0..(distances.length)).to_a)
+    distances = distances.sort
+    distances.map {|d,i| other_images[i] }
   end
 
   def human_compare_colors color1, color2
