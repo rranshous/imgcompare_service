@@ -2,7 +2,9 @@
 
 require 'ostruct'
 require 'pathname'
-require_relative '../image_fingerprinter'
+lib_path = File.absolute_path(File.join(File.dirname(__FILE__),'../lib'))
+$:.unshift lib_path
+require 'image_fingerprinter'
 
 raise 'must provide file path' if ARGV.first.nil?
 file_path = Pathname.new ARGV.first

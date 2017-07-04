@@ -1,13 +1,15 @@
 require 'sinatra'
-require_relative 'disk_scanner'
-require_relative 'image'
-require_relative 'image_collection'
-require_relative 'image_fingerprinter'
-require_relative 'color_scanner'
-require_relative 'color_saver'
-require_relative 'color_comparer'
-require_relative 'fingerprint_loader'
-require_relative 'background_runner'
+lib_path = File.absolute_path(File.join(File.dirname(__FILE__),'../lib'))
+$:.unshift lib_path
+require 'disk_scanner'
+require 'image'
+require 'image_collection'
+require 'image_fingerprinter'
+require 'color_scanner'
+require 'color_saver'
+require 'color_comparer'
+require 'fingerprint_loader'
+require 'background_runner'
 
 DATA_ROOT = 'data'
 MAX_SCAN = 50_000
