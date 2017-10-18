@@ -11,7 +11,7 @@ require 'color_comparer'
 require 'fingerprint_loader'
 require 'background_runner'
 
-DATA_ROOT = 'data'
+DATA_ROOT = ENV['DATA_ROOT'] || 'data'
 MAX_SCAN = 50_000
 
 images = ImageCollection.new
@@ -56,6 +56,19 @@ get '/images/*/data' do
   image = images.find path: Pathname.new(image_path)
   halt 404 if image.nil?
   image.data
+end
+
+get '/rainbow.html' do
+  max = (params[:max] || 5).to_i
+  """
+  <style>img { width: 300px }</style>
+  """ + \
+  ColorComparer::Colors.map do |name, color|
+   "<div style='background-color: rgb(#{color.to_a.join(',')});'><div>#{name}</div>" +
+    color_comparer.sort_similar_color_parallel(color, images).first(max)
+    .map { |img|  image_thumbnail(img) }.join("\n") +
+    '</div>'
+  end.join("\n")
 end
 
 get '/images/*/similar_color' do

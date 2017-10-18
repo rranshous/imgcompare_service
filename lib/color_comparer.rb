@@ -73,7 +73,33 @@ class ColorComparer
     distances.map {|d,i| other_images[i] }
   end
 
+  def sort_similar_color_parallel color, images
+    other_images = images.select{|o| o.colors? }.to_a
+    distances = Parallel.map(other_images) do |other_image|
+      other_image.colors.map do |other_color|
+        human_compare_colors color, other_color
+      end.reduce(:+) * ([10 - other_image.colors.length, 1].max)
+    end
+    puts "distances: #{distances}"
+    distances = distances.zip((0..(distances.length)).to_a)
+    distances = distances.sort
+    distances.map {|d,i| other_images[i] }
+  end
+
   def human_compare_colors color1, color2
     Color::Comparison.distance color1, color2
   end
+
+
+  Colors = {
+    violet: Color::RGB.new(148, 0,   211),
+    indigo: Color::RGB.new(75,  0,   130),
+    blue:   Color::RGB.new(0,   0,   255),
+    green:  Color::RGB.new(0,   255, 0),
+    yellow: Color::RGB.new(255, 255, 0),
+    orange: Color::RGB.new(255, 127, 0),
+    red:    Color::RGB.new(255, 0 ,  0),
+  }
+
+
 end

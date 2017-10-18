@@ -16,5 +16,5 @@ RUN ln -s /app/bin/* /usr/bin/
 
 RUN bundle install
 
-ENTRYPOINT ["bundle", "exec", "app/colors-service/run"]
+ENTRYPOINT ["bundle", "exec", "app/color-service/run"]
 CMD ["localhost"]
